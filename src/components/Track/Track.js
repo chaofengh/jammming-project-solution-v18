@@ -1,13 +1,20 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import "./Track.css";
 
-// each element of playlistTracks are passed props
-// it will show the name of the song, singer of the song, and alumn name of the song.
-// it will has a "+" or "-" button based on if this element is render on  the searchResult component or Playlist Component
-// different functions will be called based on the which component it is called to.
-// if this element is called from the Playlist component, it will have the isremoval attribute set to false
-// none if it is called from the SearchResult componment
 const Track = (props) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = React.createRef();
+
+  const handlePlay = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
 
   const handleAddTrack = useCallback(
     (event) => {
@@ -38,16 +45,16 @@ const Track = (props) => {
     );
   };
 
-
   return (
     <div className="Track">
       <div className="Track-information">
-        <h3>{props.track.name}</h3>
+        <h3 onClick={handlePlay}>{props.track.name}</h3>
         <p>
           {props.track.artist} | {props.track.album}
         </p>
       </div>
       {renderAction()}
+      <audio ref={audioRef} src={props.track.previewUrl}></audio>
     </div>
   );
 };
