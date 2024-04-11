@@ -26,10 +26,8 @@ const App = () => {
     }
   }, []);
 
-  const updatePlaylistId = useCallback((playlistId) =>{
-    if(PlaylistId){
-      setPlaylistId(playlistId)
-    }
+  const updatePlaylistId = useCallback((joe) =>{
+      setPlaylistId(joe)
   },[PlaylistId])
 
   const handlePlaylistSelect = useCallback(async (songs) => {
@@ -66,13 +64,46 @@ const App = () => {
   }, []);
 
 
-  const savePlaylist = useCallback(() => {
+  const savePlaylist = useCallback( async() => {
+
     const trackUris = playlistTracks.map((track) => track.uri);
-    Spotify.savePlaylist(playlistName, trackUris).then(() => {
-      setPlaylistName("New Playlist");
-      setPlaylistTracks([]);
-    });
-  }, [playlistName, playlistTracks]);
+    if(PlaylistId){
+      const songs = await Spotify.getsongs(PlaylistId)
+
+      // .filter will return an arrray of element that returned as true in the conditon
+      const tracksToAdd = playlistTracks.filter((track) =>{
+        // .some will return true of any one of the element return true in the condition
+        return !songs.some((song) => song.id === track.id)
+      })
+
+      const songsToRemove = songs.filter((song) =>{
+        return !playlistTracks.some((track) => track.uri === song.uri)
+      })
+
+      if(songsToRemove.length >0){
+        const urisToRemove = songsToRemove.map((song) =>{
+          return {uri: song.uri}
+        })
+        await Spotify.removeFromPlaylist(PlaylistId,urisToRemove)
+      }
+
+      if(tracksToAdd.length>0){
+        // convert the array of song objects to array of track.url
+        const trackURIsToAdd = tracksToAdd.map((track)=>track.uri)
+        await Spotify.addToPlaylist(PlaylistId,trackURIsToAdd)
+      }
+
+
+
+    }else if(playlistTracks){
+     await Spotify.savePlaylist(playlistName, trackUris)
+    }
+
+    setPlaylistName("New Playlist");
+    setPlaylistTracks([]);
+    setPlaylistId('');
+    
+  }, [playlistName, playlistTracks,PlaylistId]);
 
 
   // wrap the functions that add the accessToken and userId to the Spotify object

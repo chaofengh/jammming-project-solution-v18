@@ -38,6 +38,7 @@ const Track = (props) => {
     );
   };
 
+
   return (
     <div className="Track">
       <div className="Track-information">

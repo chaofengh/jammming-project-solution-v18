@@ -2,7 +2,7 @@
 
 // Spotify is created as an object  {}, so each function needs to be seperated by commas
 const Spotify = {
-  clientId: '', // Insert client ID here.
+  clientId: '089f45afb6e74d439887c399757d9bf8', // Insert client ID here.
   redirectUri: 'http://localhost:3000/', // Have to add this to your accepted Spotify redirect URIs on the Spotify API.
   accessToken: null,
   userId:null,
@@ -72,18 +72,18 @@ const Spotify = {
       return;
     }
     try{
-    const headers = { Authorization: `Bearer ${this.accessToken}` };
+    const headers = { Authorization: `Bearer ${this.accessToken}`};
     
-    // this call create an empty playlist and use the name parameter to name the plaulist
-    const response2 =  await fetch(`https://api.spotify.com/v1/users/${this.userId}/playlists`, {
+    // this call create an empty playlist and use the name parameter to name the playlist
+    const response =  await fetch(`https://api.spotify.com/v1/users/${this.userId}/playlists`, {
         headers: headers,
         method: 'POST',
         body: JSON.stringify({name: name})
       })
     
     // add the songs to the playlist by URI
-    const jsonResponse2 = await response2.json()
-    const playlistId = jsonResponse2.id
+    const jsonResponse = await response.json()
+    const playlistId = jsonResponse.id
     return fetch(`https://api.spotify.com/v1/users/${this.userId}/playlists/${playlistId}/tracks`, {
           headers: headers,
           method: 'POST',
@@ -92,7 +92,86 @@ const Spotify = {
   } catch (error){
     console.log(error)
   }
+  },
+
+  async getSavedPlaylist(){
+    try{
+    const headers = { Authorization: `Bearer ${this.accessToken}`};
+    const response = await fetch(`https://api.spotify.com/v1/me/playlists`, {
+      headers: headers
+    })
+    const jsonResponse = await response.json()
+    return jsonResponse.items.map((playlist) =>{
+      return {
+        id: playlist.id,
+        name: playlist.name
+      }
+    })}catch(error){
+      console.log(error)
+    }
+  },
+  async getsongs(playlist_id){
+    try{
+      const headers = { Authorization: `Bearer ${this.accessToken}`};
+      const response = await fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,{headers:headers})
+      const jsonResponse = await response.json()
+      const items = jsonResponse.items.map((song)=>{
+        return {
+        id: song.track.id,
+        name: song.track.name,
+        artist: song.track.artists[0].name,
+        album: song.track.album.name,
+        uri: song.track.uri
+        }
+      })
+      
+      // remove duplicate
+      // the filter function will return elements into an array for element that meet the condition
+      // findIndex will return tbe index of the first element that meet the condition.
+      // the the index of the duplicated element will not be reach because it findIndex return the first element, which will return false with item.index
+      const uniqueItems = items.filter((item,index) =>{
+        return items.findIndex((otheritem) => otheritem.id === item.id) ===index;
+      })
+
+      return uniqueItems
+
+    }catch(error){
+      console.log(error)
+    }
+  },
+
+  // get the trackURIs needs to be an array
+  async addToPlaylist(playlistId,trackURIs){ 
+    const headers = { Authorization: `Bearer ${this.accessToken}`};
+    try{
+      const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`,{
+        headers: headers,
+        method:'POST',
+        body:JSON.stringify({uris: trackURIs})
+      })
+      const jsonResponse = await response.json()
+      console.log(jsonResponse)
+    }catch(error){
+      console.log(error)
+    }
+  },
+
+  async removeFromPlaylist(playlist_id,trackURIs){
+    const headers = { Authorization: `Bearer ${this.accessToken}`};
+    try{
+      const response = await fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,{
+        headers: headers,
+        method: 'DELETE',
+        body: JSON.stringify({tracks: trackURIs})
+      })
+      const jsonResponse = await response.json()
+      console.log(jsonResponse)
+  
+    }catch(error){
+      console.log(error)
+    }
   }
+
 };
 
 export default Spotify;
