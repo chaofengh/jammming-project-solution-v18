@@ -2,7 +2,7 @@
 
 // Spotify is created as an object  {}, so each function needs to be seperated by commas
 const Spotify = {
-  clientId: '089f45afb6e74d439887c399757d9bf8', // Insert client ID here.
+  clientId: '', // Insert client ID here.
   redirectUri: 'http://localhost:3000/', // Have to add this to your accepted Spotify redirect URIs on the Spotify API.
   accessToken: null,
   userId:null,
