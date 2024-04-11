@@ -9,6 +9,8 @@ const App = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [playlistName, setPlaylistName] = useState("New Playlist");
   const [playlistTracks, setPlaylistTracks] = useState([]);
+  const [currentPlaylist,setCurrentPlaylist]= useState([]);
+  const [PlaylistId,setPlaylistId] = useState('');
 
   // all the functions are wrapped in useCallback() or useEffect() to avoid unnecessary re-render and for dependency control'
 
@@ -24,6 +26,16 @@ const App = () => {
     }
   }, []);
 
+  const updatePlaylistId = useCallback((playlistId) =>{
+    if(PlaylistId){
+      setPlaylistId(playlistId)
+    }
+  },[PlaylistId])
+
+  const handlePlaylistSelect = useCallback(async (songs) => {
+    setPlaylistTracks(songs);
+  }, [playlistTracks]);
+
   // this function add the song to the Playist component when the '+' is clicked next to the song on the SearchResult component
   // this function update the state of playlistTracks. and updating playlistTracks will cost the Playlist component to re-render
     // because playListTrack is pass-in as a prop, everytime a prop changes, it cause the component to re-render based on the prop
@@ -38,6 +50,7 @@ const App = () => {
     // every changes on the playListracks, it will re-render
     [playlistTracks]
   );
+
   
   // this function remove the song on the Playist component when the '-' is clicked next to the song on the SearchResult component
   // this function update the state of playlistTracks. and updating playlistTracks will cost the Playlist component to re-render
@@ -66,10 +79,13 @@ const App = () => {
   // the getAccessToken and getUserId method will be called every hour to get the latest valid token
   useEffect(() => {
   // Function to fetch access token and user ID
-    const fetchAccessTokenAndUserID = () => {
+    const fetchAccessTokenAndUserID = async() => {
       Spotify.getAccessToken();
       Spotify.getUserId();
+      setCurrentPlaylist(await Spotify.getSavedPlaylist())
     };
+
+
 
     // Initial call
     fetchAccessTokenAndUserID();
@@ -82,7 +98,6 @@ const App = () => {
   }, []);
 
 
-
   return (
     <div>
       <h1>
@@ -91,14 +106,19 @@ const App = () => {
       <div className="App">
         <SearchBar onSearch={search} />
         <div className="App-playlist">
-          <SearchResults searchResults={searchResults} onAdd={addTrack} />
+          <SearchResults 
+            searchResults={searchResults} 
+            onAdd={addTrack} 
+            currentPlaylist={currentPlaylist}
+            onPlaylistSelect={handlePlaylistSelect}
+            updatePlaylistName={updatePlaylistName}
+            updatePlaylistId={updatePlaylistId}/>
           <Playlist
             playlistName={playlistName}
             playlistTracks={playlistTracks}
             onNameChange={updatePlaylistName}
             onRemove={removeTrack}
             onSave={savePlaylist}
-
           />
         </div>
       </div>

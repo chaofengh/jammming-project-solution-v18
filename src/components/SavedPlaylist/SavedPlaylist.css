@@ -1,0 +1,11 @@
+.SavedPlaylist h3{
+    margin-bottom: .23rem;
+    border-bottom: 1px solid rgba(256, 256, 256, 0.8);
+    height: 35px;
+}
+
+.SavedPlaylist h2{
+    margin-top: 40px;
+    margin-bottom: 10px;
+}
+
