@@ -50,7 +50,9 @@ const Spotify = {
           name: track.name,
           artist: track.artists[0].name,
           album: track.album.name,
-          uri: track.uri}
+          uri: track.uri,
+          previewUrl: track.preview_url
+        }
       })
     }} catch (error){
       console.log(error)
@@ -121,7 +123,8 @@ const Spotify = {
         name: song.track.name,
         artist: song.track.artists[0].name,
         album: song.track.album.name,
-        uri: song.track.uri
+        uri: song.track.uri,
+        previewUrl: song.track.preview_url
         }
       })
       

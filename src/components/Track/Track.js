@@ -5,9 +5,7 @@ const Track = (props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = React.createRef();
 
-  const handlePlay = () => {
-    if (!audioRef.current) return;
-
+  const handlePlay = (event) => {
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -45,14 +43,33 @@ const Track = (props) => {
     );
   };
 
+  const playButton = () =>{
+    if(props.track.previewUrl){
+      return(
+        <div>
+        <div className = 'Track-playButton' onClick = {handlePlay}>
+          {isPlaying?
+            <span className='material-icons'>
+              pause_circle
+            </span> : 
+            <span className = 'material-icons'>
+              play_circle</span>
+          }
+        </div>
+        </div>
+      )
+    }
+  }
+
   return (
     <div className="Track">
       <div className="Track-information">
-        <h3 onClick={handlePlay}>{props.track.name}</h3>
+        <h3>{props.track.name}</h3>
         <p>
           {props.track.artist} | {props.track.album}
         </p>
       </div>
+      {playButton()}
       {renderAction()}
       <audio ref={audioRef} src={props.track.previewUrl}></audio>
     </div>

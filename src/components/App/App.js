@@ -26,6 +26,7 @@ const App = () => {
     }
   }, []);
 
+
   const updatePlaylistId = useCallback((joe) =>{
       setPlaylistId(joe)
   },[PlaylistId])
@@ -112,7 +113,7 @@ const App = () => {
   // Function to fetch access token and user ID
     const fetchAccessTokenAndUserID = async() => {
       Spotify.getAccessToken();
-      Spotify.getUserId();
+      await Spotify.getUserId();
       setCurrentPlaylist(await Spotify.getSavedPlaylist())
     };
 
@@ -127,6 +128,7 @@ const App = () => {
     // Cleanup function to clear interval
     return () => clearInterval(intervalId);
   }, []);
+
 
 
   return (
