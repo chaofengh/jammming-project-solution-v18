@@ -20,6 +20,8 @@ const App = () => {
   const search = useCallback(async (term) => {
     try{
       const result = await Spotify.search(term)
+
+      // only show songs that are not already in the playlist
       const filteredResult = result.filter((track) =>{
         return !playlistTracks.some((savedtrack) => savedtrack.id === track.id)
       })
