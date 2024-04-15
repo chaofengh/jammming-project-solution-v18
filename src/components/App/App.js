@@ -20,11 +20,14 @@ const App = () => {
   const search = useCallback(async (term) => {
     try{
       const result = await Spotify.search(term)
-      setSearchResults(result)
+      const filteredResult = result.filter((track) =>{
+        return !playlistTracks.some((savedtrack) => savedtrack.id === track.id)
+      })
+      setSearchResults(filteredResult)
     }catch(error){
       console.log(error)
     }
-  }, []);
+  }, [playlistTracks]);
 
 
   const updatePlaylistId = useCallback((joe) =>{
